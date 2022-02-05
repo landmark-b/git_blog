@@ -45,3 +45,7 @@ def apply_le(series:pd.Series, labels=[]):
 
     return encoded_label
 
+
+def calc_missing_rate(df: pd.DataFrame):
+    """ データフレームの列毎の欠損率を降順で出力 """
+    print((df.isnull().sum()/len(df)).sort_values(ascending=False))
