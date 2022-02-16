@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset as BaseDataset
 import segmentation_models_pytorch as smp
 # import albumentations as albu
+from typing import List
 
 def img_scaler(img:np.array) -> np.array:
     """ 0~255の範囲にスケーリングする
@@ -93,7 +94,7 @@ def calc_region(imshape, left_bottom_rate, left_top_rate, right_top_rate, right_
         right_bottom_rate ([type]):  画像に対する、右下の点の割合
 
     Returns:
-        [list of list]: マスク領域の４点を示すリスト[[w1,h1],[w2,h2],[w3,h3],[w4,h4]]
+        (List[List[int]]): マスク領域の４点を示すリスト[[w1,h1],[w2,h2],[w3,h3],[w4,h4]]
     """
 
     left_bottom = imshape * np.array(left_bottom_rate)
@@ -167,16 +168,13 @@ def pipeline_calc_white_lines(img:np.ndarray, param:dict, DEBUG=False) -> np.nda
     """
 
     # gray & edge detect
-    gray_img = grayscale(img)
+    gray_img = grayscale(img) if img.ndim==3 else img
     edges = canny(gray_img, **param['canny'])
     if DEBUG:
         plt_imshow(edges)
 
-    # create a masked edges image
-    mask = np.zeros_like(edges)
-    ignore_mask_color = 255
-
     ## define a four sided polygon to mask
+    ignore_mask_color = 255
     mask = np.zeros_like(edges)
     # TODO 白線検出領域の設定値の決め方
     region_coord = calc_region(np.array(gray_img.shape)[::-1], **param['region_rate'])
@@ -197,7 +195,7 @@ def pipeline_calc_white_lines(img:np.ndarray, param:dict, DEBUG=False) -> np.nda
 
     return line_img
 
-def weighted_img(img, initial_img, a=0.8, b=1., c=0.):
+def weighted_img(initial_img, img, a=0.8, b=1., c=0.):
     """ overlay img
     output = initial_img * α + img * β + γ
     NOTE: initial_img and img must be the same shape!
@@ -234,7 +232,7 @@ def plt_imshow(img:np.ndarray, is_bgr=False, cmap='gray', title=None):
 
     _, ax = plt.subplots()
     if title:
-        ax.set_title(title, fontsize=16, color='white')
+        ax.set_title(title, fontsize=16, color='black')
     ax.imshow(img, cmap=cmap)
 
 def visualize(**images):
