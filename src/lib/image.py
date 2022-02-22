@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset as BaseDataset
 import segmentation_models_pytorch as smp
 # import albumentations as albu
-from typing import List
+from typing import List, Union
 
 def img_scaler(img:np.array) -> np.array:
     """ 0~255の範囲にスケーリングする
@@ -204,11 +204,11 @@ def weighted_img(initial_img, img, a=0.8, b=1., c=0.):
     return cv2.addWeighted(initial_img, a, img, b, c)
 
 
-def draw_bbox(img:np.ndarray, bbox:np.ndarray, clr=100, thickness=1):
+def draw_bbox(img:np.ndarray, bbox:Union[np.ndarray, list], clr=100, thickness=1):
     """ bboxをimgに描画
     Args:
         img (np.ndarray): image
-        bbox (np.ndarray): [x, y, w, h]形式
+        bbox (np.ndarray or list): [x, y, w, h]形式
         clr (int or list): color
     """
     x, y, w, h  = [int(v) for v in bbox]
@@ -216,12 +216,13 @@ def draw_bbox(img:np.ndarray, bbox:np.ndarray, clr=100, thickness=1):
 
     return img
 
-def plt_imshow(img:np.ndarray, is_bgr=False, cmap='gray', title=None):
+def plt_imshow(img:np.ndarray, is_bgr=False, cmap='gray', title=None, is_noticks=True):
     """ 画像を表示
 
     Args:
         img (np.ndarray): 画像のndaray
         is_bgr (bool, optional): カラー表現がBGRか. Defaults to False.
+        is_ticks (bool, optional): ラベルを表示するか。 Defaults to True
     Note:
         OpenCVで画像ファイルをReadした場合はBGR形式で読まれ、
         pltはRGB形式で処理するため、変換が必要。
@@ -233,6 +234,11 @@ def plt_imshow(img:np.ndarray, is_bgr=False, cmap='gray', title=None):
     _, ax = plt.subplots()
     if title:
         ax.set_title(title, fontsize=16, color='black')
+
+    if is_noticks:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
     ax.imshow(img, cmap=cmap)
 
 def visualize(**images):
