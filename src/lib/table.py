@@ -49,3 +49,13 @@ def apply_le(series:pd.Series, labels=[]):
 def calc_missing_rate(df: pd.DataFrame):
     """ データフレームの列毎の欠損率を降順で出力 """
     print((df.isnull().sum()/len(df)).sort_values(ascending=False))
+
+
+# assume to add ItemCf
+class ItemCf():
+    """ Item based Collaborative Filter.
+    reference: https://towardsdatascience.com/prototyping-a-recommender-system-step-by-step-part-1-knn-item-based-collaborative-filtering-637969614ea
+    """
+
+    def __init__(self):
+        pass
