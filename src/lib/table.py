@@ -19,6 +19,7 @@
 
 import os
 import json
+from typing import Union 
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -57,6 +58,40 @@ def remove_outlier(df, z_thresh=10, ret_id=False):
     return ret
 
 ### Visualize
+# FIXME add docstring and make clean
+def plot_hist(df:pd.DataFrame, cols:Union[list, np.array, None]=None, n_graph_col=3, graph_type='hist', n_bins=20, density=True, figsize=(12,12)) -> pd.DataFrame:
+    if cols is None:
+        cols = df.columns
+
+    n_col = len(cols)
+    n_r = n_col // n_graph_col
+    n_c =  n_graph_col
+
+    fig, axes = plt.subplots(n_r+1, n_c, figsize=figsize)
+    for i, col in enumerate(cols):
+        _c = i % n_graph_col
+        _r = i // n_graph_col
+
+        axes[_r, _c].hist(df[col], bins=n_bins, density=density) # density=Trueを追加すると確率密度になる。
+        axes[_r, _c].set_title(f'{col}')
+
+
+def plot_scatter(df:pd.DataFrame, target_col, cols:Union[list, np.array, None]=None, n_graph_col=3, graph_type='scatter', figsize=(12,12)) -> pd.DataFrame:
+    if cols is None:
+        cols = df.columns
+
+    n_col = len(cols)
+    n_r = n_col // n_graph_col
+    n_c =  n_graph_col
+
+    fig, axes = plt.subplots(n_r+1, n_c, figsize=figsize)
+    for i, col in enumerate(cols):
+        _c = i % n_graph_col
+        _r = i // n_graph_col
+
+        axes[_r, _c].scatter(df[col], df[target_col]) # density=Trueを追加すると確率密度になる。
+        axes[_r, _c].set_title(f'{col}')
+
 
 ### Geometry
 def dms2dd(s):
